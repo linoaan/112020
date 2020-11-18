@@ -1,0 +1,360 @@
+---
+title: "Introducción a R Markdown"
+author: "Lino AA Notarantonio"
+date: "11/6/2020"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE, tidy=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+options(warn = -1)
+```
+
+# Introducción
+
+## Material del taller
+
+En el repositorio <https://github.com/linoaan/CEDDIE> encuentran
+
+- la presentación, `11062020PPT.pptx`, y el archivo R Markdown `11062020PPT.Rmd`
+
+- el documento Word, `11062020DOCX.docx`, y el archivo R Markdown `11062020DOCX.Rmd`
+
+- Los datos que se usarán, `logdp.csv`
+
+
+## Propósito de la presentación
+
+Desarrollo de un entorno en donde se puedan incluir de manera orgánica la parte de desarrollo estadístico y de redacción matemática.
+
+Más precisamente, cómo usar el lenguaje R Markdown
+
+- para presentar resultados de la ejecución de código de R en una presentación (Powerpoint);
+
+- mostrar cómo se pueden redactar presentaciones para unir el texto con el resultado del código
+
+
+# R Markdown 
+
+## ¿Qué es R Markdown
+
+- Markdown es un lenguaje *markup*, es decir, es un lenguaje de programación que usa etiquetas  (*tags*) para definir elementos en un documento.
+
+- Ejemplos de lenguajes markup son HTML, (La)TeX, XML.
+
+- R Markdown es un lenguaje Markdown que permite la inclusión y ejecución de código en R (*code chunks*) para escribir documentos en HTML, PDF, Word, entre otros. 
+
+- Un archivo R Markdown tiene extensión `.Rmd`
+
+## ¿Qué es R Markdown
+
+- La creación del documento (Powerpoint; Word) que incluye texto, fórmulas y código se realiza dando click al botón `Knit`. 
+
+- Más información acerca de R Markdown se encuentra en <http://rmarkdown.rstudio.com>.
+
+# Preparación de la presentación
+
+## Creación del archivo .Rmd
+
+- Abrir Rstudio y el directorio de trabajo (*project*), de ser necesario. 
+
+- Dar click en `Files`; seleccionar `New File` y después `R Markdown`
+
+- En la ventana de diálogo seleccionar en el panel a la izquierda (véase la siguiente diapositiva) la opción PowerPoint. El título se puede cambiar después de crear el archivo `.Rmd`
+
+```{r, echo = FALSE, out.width = '1.75\\linewidth', fig.cap = "panel presentación", fig.pos='H'}
+knitr::include_graphics("presentationrmarkdown.pdf")
+```
+
+## Creación del archivo .Rmd
+
+- Después de seleccionar `PowerPoint` y dar click en `OK`, se abre el archivo R Markdown en la ventana izquierda arriba de RStudio (véase la siguiente diapositiva).
+
+- Ahora se puede poner el título de la presentación que se generará. 
+
+- El archivo contiene código introductorio con algunos ejemplos.
+
+```{r, echo = FALSE, out.width = '1.75\\linewidth', fig.cap = "archivo Rmd", fig.pos='H'}
+knitr::include_graphics("presentationrmarkdown2.pdf")
+```
+
+## Redacción del texto en R Markdown
+
+En el documento R Markdown, 
+
+- usar `#` para definir secciones en la presentación.
+
+- usar `##` para crear una diapositiva; texto después de `##` será el título de la misma.
+
+- Esta diapositiva `## Redacción del texto en R Markdown` en el documento R Markdown.
+
+- Se pueden usar `###` para crear subtítulos en una diapositiva (ejemplos más adelante).
+
+## Fórmulas (matemáticas)
+
+- La inclusión de fórmulas en un documento RMarkdow se realiza de manera semejante a (La)TeX:
+    - acomplando el símbolo de peso para fórmulas en en texto (*inline equation*): \$ *fórmula* \$;
+    - *displayed equations*, usando \\[  *fórmula al centro del texto* \\] 
+
+- Si se usa el formato Word, o Powerpoint, las fórmulas en el documento resultante se podrán editar usando el editor de ecuaciones del programa. 
+
+## Ejemplos de fórmulas
+
+### Ejemplo 1 
+El área de un círculo de radio $r$ es $A = \pi r^2$.
+
+### Ejemplo 2 
+El valor esperado de una variable aleatoria real, $X$, con densidad $f(x)$, es  
+\[
+  E[X] = \int_{-\infty}^\infty xf(x) dx
+\]
+
+# Diapositiva con salida de R
+
+## Introducción
+
+- En un documento R Markdown se puede introducir código (`code chunks`) usando el botón `Insert` y seleccionando `R`.
+
+- Se pueden también usar los atajos de teclado
+    - `Ctrl + Alt + I` (Windows; Linux)
+    - `Cmd + Option + I` (MacOS; Option = Alt)
+
+## Code chunk
+
+- Ejemplo de `code chunk`: ` ```{r} código ``` `
+
+
+- Entre las llaves, se pueden poner parámetros opcionales; véase <https://bookdown.org/yihui/rmarkdown/r-code.html> para más información. 
+
+
+## Code chunks
+
+### Code chunk
+
+` ```{r, echo = TRUE} summary(cars) ``` `
+
+### Salida 
+
+```{r, echo = TRUE}
+summary(cars)
+```
+
+
+## Code chunk
+
+### Code chunk
+
+` ```{r, eval = FALSE} summary(cars) ``` `
+
+### Salida 
+
+```{r, eval = FALSE}
+summary(cars)
+```
+
+El código se puede copiar de la presentación (o del documento en PDF asociado) y pegarlo en la consola de RStudio. Útil para los estudiantes. 
+
+## Gráficas
+
+Las gráficas aparecen en la siguiente diapositiva.
+
+```{r, echo = TRUE}
+plot(cars$speed, cars$dist)
+```
+
+# Ejemplo de manipulación de datos
+
+## Carga de datos
+
+Usaremos datos tomados de <https://ourworldindata.org/grapher/learning-outcomes-vs-gdp-per-capita>, que agrupa datos de puntajes de aprendizaje, del PIB por cápita y del tamaño de la población de diferentes países. 
+
+Es conveniente poner los datos en el directorio de trabajo (*project*).
+
+### Carga de los datos
+
+```{r}
+logdp <- read.csv("logdp.csv")
+```
+
+
+## Información acerca de los datos
+
+Los datos cargados son un `data.frame`:
+```{r}
+class(logdp)
+```
+
+Hay 49988 observaciones (renglones) y 6 variables (columnas):
+```{r}
+dim(logdp)
+```
+
+## Información acerca de los datos
+
+Nombre de las variables: 
+```{r}
+names(logdp)
+```
+
+Hay variables supérfluas (`Entity`, `Code`) y con nombres muy largos
+
+## Manipulación de los datos
+
+Primeramente, eliminaremos la primera columna, `Entity`; después, renombraremos las variables de puntaje, PIB por cápita y tamaño de la población. Finalmente, seleccionaremos las variables de `USA`, `CAN`.
+
+### Código
+
+```{r}
+logdp <- logdp[c(-1)]
+colnames(logdp)[3] <- "score"
+colnames(logdp)[4] <- "GDPcap"
+colnames(logdp)[5] <- "Pop"
+can <- logdp[logdp$Code == "CAN",]
+usa <- logdp[logdp$Code == "USA",]
+```
+
+## Manipulación de los datos
+
+```{r}
+head(can)
+```
+
+```{r}
+head(usa)
+```
+
+## Manipulación de los datos
+
+```{r}
+summary(can[c(3,4)])
+```
+
+## Análisis de los datos
+
+```{r}
+mean(can$score)
+```
+
+```{r}
+mean(can$score, na.rm = TRUE)
+```
+
+```{r}
+mean(usa$score, na.rm = T)
+```
+
+
+## Análisis de los datos
+
+### t-test
+
+Probar que el puntaje canadiense es mayor que el puntaje de EEUU
+
+```{r, echo = TRUE, eval=FALSE}
+x1 <- can$score
+x2 <- usa$score
+t.test(x1, x2, mu = 0, alternative = "greater")
+```
+
+## Análisis de los datos: t-test
+
+```{r}
+x1 <- can$score
+x2 <- usa$score
+t.test(x1, x2, mu = 0, alternative = "greater")
+```
+
+## Análisis de los datos: t-test, varianzas iguales
+
+```{r}
+x1 <- can$score
+x2 <- usa$score
+t.test(x1, x2, mu = 0, alternative = "greater", var.equal = TRUE)
+```
+
+## Análisis de datos: prueba de varianzas
+
+```{r,echo=TRUE, eval=FALSE}
+var.test(x1,x2, ratio = 1, conf.level = .95)
+```
+
+- `ratio = 1`, `conf.level = .95` son valores por defecto en la función `var.test()`
+
+- En el code chunk `echo = TRUE`, `eval = FALSE` para poder desplegar el código, sin ejecutarlo
+
+- En la siguiente diapositiva, se usa `echo = FALSE`, `eval = TRUE` en el code chunk para ejecutar el código, sin ejecutarlo
+
+## Análisis de datos: prueba de varianzas
+
+```{r, echo=FALSE, eval=TRUE}
+var.test(x1,x2, ratio = 1, conf.level = .95)
+```
+
+
+## Análisis de los datos: t-test
+
+```{r}
+y1 <- can$Pop
+y2 <- usa$Pop
+t.test(y1, y2, mu = 0, alternative = "less")
+```
+
+## Análisis de los datos: power test
+
+Estimación de la potencia, con efecto unitario (`sd = 1`, por defecto):
+
+```{r, echo=T, eval=F}
+y1 <- can$Pop
+y2 <- usa$Pop
+n1 <- length(y1)
+n2 <- length(y2)
+power.t.test(n = min(n1, n2), delta = 1, sig.level = .05, 
+             alternative = "one.sided", type = "two.sample")
+```
+
+- $efecto = |\mu_1 - \mu_2|/sd$; 
+
+- $delta = |\mu_1 - \mu_2|$.
+
+## Análisis de los datos: power test
+
+```{r, echo=F, eval=T}
+y1 <- can$Pop
+y2 <- usa$Pop
+n1 <- length(y1)
+n2 <- length(y2)
+power.t.test(n = min(n1, n2), delta = 1, sig.level = .05, 
+             alternative = "one.sided", type = "two.sample")
+```
+
+
+
+## Análisis de los dato 
+
+### Power curve as a function of the sample size
+
+```{r}
+curve(power.t.test(n = x ,delta=1,sd=1, type = "two.sample",
+alternative = "one.sided")$power, from=5, to=100, xlab="n",
+ylab="power")
+```
+
+## Análisis de los dato 
+
+### Power curve as a function of delta (sd = 1)
+
+```{r}
+curve(power.t.test(delta = x ,n = 100 ,sd=1, type = "two.sample",
+alternative = "one.sided")$power, from=.01, to=1, xlab="delta",
+ylab="power")
+```
+
+## Análisis de los dato 
+
+### Power curve as a function of delta (sd = 2)
+
+```{r}
+curve(power.t.test(delta = x ,n = 100 ,sd=5, type = "two.sample",
+alternative = "one.sided")$power, from=.01, to=2.5, xlab="delta",
+ylab="power")
+```

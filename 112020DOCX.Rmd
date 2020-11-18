@@ -1,0 +1,310 @@
+---
+title: "Introducción a R Markdown"
+author: "Lino AA Notarantonio"
+date: "11/6/2020"
+output: 
+  word_document:
+    toc: true
+---
+
+```{r setup, include=FALSE, tidy=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+options(warn = -1)
+```
+
+# Introducción 
+
+Queremos mostrar las capacidades de R Markdown en la creación de un documento que contenga de manera transparente datos, código y texto, con fórmulas. Como ejemplo, usaremos los mismos datos de la presentación para estimar un modelo de regresión lineal, con diagnóstico de la estimación. 
+
+Para simplificar el manejo de datos, conviene crear un *project* (directorio de trabajo) y poner los datos en este directorio. 
+Antes de empezar con el manejo de datos, se dará una breve introducción a la redacción del documento usando el lenguaje R Markdown. 
+
+# Introducción a R Markdown
+
+Un archivo R Markdown tiene la extensión **`Rmd`**. La gran diferencia en la redacción de un documento R Markdown se encuentra en el resultado final. En el encabezado de un archivo R Markdown se pueden pasar diferentes valores de salida:
+
+- **`output: word_document`**, para generar un documento Word; 
+
+- **`output: powerpoint_presentation`**, para generar una presentación Powerpoint. 
+
+entre otros: véase, por ejemplo, [aquí](https://rmarkdown.rstudio.com/lesson-9.html). 
+
+Si la salida del programa R Markdown es un documento Word, podemos dividir el material usando secciones, subsecciones, subsubsecciones, etc., usando el tag **`#`**, **`##`**, **`###`**, respectivamente, hasta nivel 6.
+
+Se pueden redactar fórmulas matemáticas, de manera semejante a (La)teX, usando 
+
+- **`$ inline equation $`**, para ecuaciones en el texto; 
+
+- **`\[ displayed equation \]`**, para ecuaciones centrada a parte.
+
+Se pueden incluir en el documento de salida 
+
+* *bullet points*, listas ordenadas; 
+
+* tablas;
+
+* nota a pie de página, 
+
+y más. Pueden bajar el Cheat Sheet [aquí](https://raw.githubusercontent.com/rstudio/cheatsheets/master/rmarkdown-2.0.pdf).
+
+Para facilitar la comprensión del lenguaje R Markdown, ponemos a disposición de los participantes los archivos **`Rmd`** y los  documentos (Word; Powerpoint) de salida. 
+
+
+# Análisis preliminar de los datos
+
+El dataset se baja del sitio [Our World in Data](https://ourworldindata.org/grapher/learning-outcomes-vs-gdp-per-capita?time=latest) y agrupa observaciones de puntajes promedio de aprendizaje y de PIB por capita, entre otros. 
+
+## Carga de los datos
+
+```{r datos}
+logdp <- read.csv("logdp.csv")
+class(logdp)
+```
+
+La primera línea de código, a la derecha del símbolo de asignación, **`<-`**, carga los datos y asigna el resultado al objeto de R **`logdp`**, a la izquierda de **`<-`**. 
+
+La segunda línea de código muestra que el objeto es un **`dataframe`**.
+
+Después, 
+```{r}
+dim(logdp)
+```
+
+muestra que el dataframe consiste de 49988 observaciones y 6 variables; el nombre de las variables se despliega con 
+```{r}
+names(logdp)
+```
+
+También, se pueden desplegar las primeras 
+```{r}
+head(logdp)
+```
+
+y las últimas 6 observaciones
+```{r}
+tail(logdp)
+```
+
+Detectamos la presencia de valores ausentes, **`NA`**, en el dataset. 
+
+## Manipulaciones del dataset
+
+Vimos que el dataset contiene nombre de paises y las correspondientes siglas internacionales, por lo que consideramos que una de las variables es superflua; además, se puede acortar el nombre de las variables del puntaje promedio y del PIB por cápita.
+
+**Comentario** Vale la pena subrayar que el dataset original no se modifica. Todas las manipulaciones quedarán en este documento solamente. 
+
+Empezamos a eliminar la primera variable (nombre completo del país): 
+```{r}
+logdp <- logdp[c(-1)]
+names(logdp)
+```
+
+El comando **`logdp[c(-1)]`** en el primera línea de código, a la derecha del operador de asignación **`<-`**, opera un *subsetting* del dataset **`logdp`**, es decir, la determinación de un subconjunto del dataset originario; el *subsetting* se determina por los corchetes, **`logdp[ ]`**. 
+
+El efecto del subsetting consiste en la eliminación de la primera variable, que se realiza usando el operador de *concatenación*, **`c()`**, aplicado al conjunto de las variables de interés, numeradas de la **`1`** hasta la **`6`**; en este caso, queremos eliminar la primera variable, eliminación que se puede hacer mediante el signo menos, **`-`**: 
+**`c(-1)`**.
+
+Después, para acortar el nombre de las variables del puntaje promedio y del PIB por cápita, ejecutamos
+```{r}
+colnames(logdp)[3] <- "score"
+colnames(logdp)[4] <- "GDPcap"
+colnames(logdp)[5] <- "Pop"
+head(logdp)
+```
+
+La función **`colnames(logdp)`** tiene como salida un vector de caracteres, que agrupa los nombres ordenados del dataframe.
+
+El comando **`colnames(logdp)[i]`** indica el componente **`i`** de esta salida; las primeras dos líneas de código asignan el carácter **`score`** al tercer componente, **`GDPcap`** al cuarto y **`Pop`** al quinto, respectivamente. 
+
+## Manipulación de variables
+
+La manipulación de una variable individual en un dataframe se realiza mediante la *extracción* de esta variable del dataframe. Por ejemplo, si queremos analizar la variable **`Pop`**, la extraemos del dataset mediante el operador **`$`**, usando la sintaxis **`logdp$Pop`**. Para desplegar las primeras seis observaciones de esta variable, 
+```{r}
+head(logdp$Pop)
+```
+
+### Selección de un país
+
+Para seleccionar un país específico, podemos pedir que la variable **`Code`** del dataset sea igual al valor del código deseado. Por ejemplo, si queremos usar los valores de Suecia (código **`SWE`** en el dataset):
+
+```{r}
+swe <- logdp[logdp$Code == "SWE",]
+```
+
+Nótese como en el subsetting en la primera línea de código, se pone la coma, para indicar la selección de todas las observaciones (renglones) asociadas a Suecia (sintaxis semejante a la que se usa en Matlab). 
+
+**Comentario** El símbolo **`=`** es también un operador de asignación en R, con menor prioridad de **`<-`** (véase [aquí](https://stackoverflow.com/questions/1741820/what-are-the-differences-between-and-assignment-operators-in-r)).
+
+El dataset de las solas observaciones de Suecia consiste de
+```{r}
+dim(swe)
+```
+
+720 observaciones y 5 variables. 
+
+## Estadísticos principales
+
+La estimación de los estadísticos principales de un dataframe se realiza de manera sencilla usando la función **`summary()`**; por ejemplo, aplicada a la variable **`Pop`** :
+```{r}
+summary(swe$Pop)
+```
+o al dataframe completo
+```{r}
+summary(swe)
+```
+
+o solo a la parte numérica (nótese el subsetting que se realiza para obtener un subconjunto del dataframe originario):
+```{r}
+summary(swe[c(-1, -2)])
+```
+
+La salida de la función **`summary()`** no contiene la desviación estándar.
+
+Podemos aplicar la función **`sd()`** a cada variable, por ejemplo, **`Pop`**
+```{r}
+sd(swe$Pop, na.rm = TRUE)
+```
+
+o podemos usar la vectorización del lenguaje R y aplicar la función **`sapply()`** a la parte numèrica del dataframe, eliminando los valores ausentes
+
+```{r}
+sapply(swe[c(-1,-2)], sd, na.rm = TRUE)
+```
+
+La función **`sapply()`** es parte de una familia de funciones que operan de manera semejante en diferentes contextos; todas tienen la misma sintaxis: **`sapply(nombre_dataset, función, ...)`**, donde **`...`** indican parámetros adicionales. 
+
+# Regresión lineal
+
+Como ejemplo de una estimación de una regresión lineal en R, queremos estimar el efecto de la educación (proxied por **`score`**) y el nivel de la población sobre el PIB por cápita:
+\[
+  GDPcap = \beta_0 + \beta_1 score + \beta_2 Pop + u
+\]
+
+**Comentario** Cuando se usan variables del mismo dataframe, conviene usar la función **`attach()`** 
+```{r}
+attach(swe)
+```
+
+Cuando se termina el uso del dataframe se usa **`detach()`** para terminar el uso del dataframe. 
+
+## Estimación del modelo de regresión
+
+La estimación del modelo de regresión lineal se realiza mediante la función **`lm()`**
+```{r}
+m <- lm(GDPcap ~ score + Pop)
+```
+
+Conviene asignar el resultado de la estimación a un objeto de R, en este caso, **`m`**. 
+
+El resumen de la estimación se obtiene usando la función **`summary()`**:
+```{r}
+summary(m)
+```
+
+Nótese que la estimación sólo usa observaciones válidas; en este caso, $T=10$ es el tamaño muestral, con 
+```{r}
+m$df.residual
+```
+grados de libertad residuos. 
+
+## Diagnóstico
+
+Un diagnóstico típico de una regresión lineal involucra una prueba de 
+
+- normalidad;
+
+- heterocedasticidad;
+
+- autocorrelación serial, y
+
+- adecuación funcional
+
+
+### Diagnóstico visual
+
+Un diagnóstico visual se hace usando la función **`plot()`** aplicada al objeto de la estimación:
+```{r}
+plot(m)
+```
+
+### Diagnóstico formal
+
+En un diagnóstico formal, se prueban hipótesis estadísticas acerca de los errores de la regresión lineal.
+
+La hipótesis nula, en cada caso, es el cumplimiento de los correspondientes supuestos del modelo de regresión lineal clásico (Teorema de Gauss-Markov). 
+
+En las pruebas de hipótesis usaremos $\alpha = .05$ como nivel de significancia.
+
+#### Prueba de normalidad
+
+La prueba de normalidad se puede realizar usando la prueba de Shapiro-Wilk, implementada con la función **`shapiro.test()`** en la librería **`stats`**, cargada por defecto cuando R arranca. 
+```{r}
+shapiro.test(m$residuals)
+```
+
+Concluimos que los errores son normales (más precisamente, no existe evidencia de falta de normalidad en los residuos). 
+
+Las demás pruebas de diagnóstico usan funciones de la librería **`lmtest`** (que se debe bajar y cargar en la sesión). Si se quiere usar la matriz de varianza-covarianza robusta a heterocedasticidad, entonces conviene también (bajar y) cargar la librería **`sandwich`**.
+
+Esta librería no se encuentra en la distribución estándar de R, por lo que se debe bajar localmente (en la computadora) y, después, cargar en la sesión de trabajo. 
+
+```{r, eval = FALSE}
+install.packages("lmtest")
+```
+
+Una vez bajada localmente, sólo se deberá cargar la librería en la sesión de trabajo cuando sea necesario. 
+```{r}
+library(lmtest)
+```
+
+### Prueba de heterocedasticidad
+
+La prueba de Breusch-Pagan se implementa con la función **`bptest()`**:
+```{r}
+bptest(m)
+```
+
+No existe evidencia de heterocedasticidad en el modelo. 
+
+### Prueba de autocorrelación serial
+
+#### Prueba de Durbin-Watson
+
+```{r}
+dwtest(m)
+```
+
+#### Prueba de Breusch-Godfrey
+
+```{r}
+bgtest(m, order = 6)
+```
+
+No se detecta evidencia de autocorrelación serial (hasta 6 rezagos) en el modelo.
+
+### Prueba de adecuación funcional 
+
+Por simplicidad, se incluye sólamente la prueba RESET de Ramsey. 
+
+#### Prueba RESET
+
+En esta prueba se quiere determinar si el modelo necesita términos cuadráticos o cúbicos. La hipótesis nula es que no son necesarios. 
+
+La prueba en R se realiza usando ya sea los valores ajustados o las potencias de los regresores. 
+
+Prueba con los valores ajustados:
+```{r}
+resettest(m, power = 2:3, type = "fitted")
+```
+
+
+Prueba con los regresores:
+```{r}
+resettest(m, power = 2:3, type = "regressor")
+```
+
+No se detecta la necesidad de términos cuadráticos o cúbicos.
+
+```{r}
+detach(swe)
+```
